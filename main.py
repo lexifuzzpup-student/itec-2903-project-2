@@ -1,4 +1,9 @@
 from flask import Flask, render_template, request, send_from_directory
+from dotenv import load_dotenv
+from google import genai
+from google.genai.types import GenerateContentConfig
+
+load_dotenv()
 
 # create the app, labeled using the current filename
 app = Flask(__name__)
