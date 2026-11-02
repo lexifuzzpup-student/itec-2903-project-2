@@ -4,9 +4,11 @@ from flask import Flask, render_template, request, send_from_directory
 app = Flask(__name__)
 
 # define webpage route and callback
-@app.route("/")
+@app.route("/",methods=["GET","POST"])
 def homepage():
-    return 'hello!'
+    url = request.form.get("url")
+    return render_template("homepage.html",url=url)
+
 
 # run the server if the file is directly executed
 if __name__ == "__main__":
