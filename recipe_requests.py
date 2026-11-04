@@ -21,5 +21,6 @@ def fetch_recipe_website(url):
 
 # for local testing
 if __name__ == "__main__":
-    response = fetch_recipe_website("https://www.seriouseats.com/the-best-roast-potatoes-ever-recipe")
+    website_url = input("Enter website URL- ").strip()
+    response = fetch_recipe_website(website_url)
     print(response)
