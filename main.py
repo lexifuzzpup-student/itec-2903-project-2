@@ -4,6 +4,7 @@ from google import genai
 from google.genai.types import GenerateContentConfig
 
 from schema import get_model_config # Import the schema and prompt settings
+from recipe_requests import fetch_recipe_website
 
 load_dotenv()
 
