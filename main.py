@@ -11,6 +11,14 @@ load_dotenv()
 # store processed recipes in a { [uuid]: [recipe] } dict
 recipes = {}
 
+# generate the recipe json data
+def generate_recipe_data(url: str):
+    website_contents = fetch_recipe_website(url)
+
+    # TODO: process data with gemini
+    
+    return { "contents": website_contents }
+
 # create the app, labeled using the current filename
 app = Flask(__name__)
 
@@ -41,7 +49,7 @@ def generate_recipe():
     # check if the recipe already exists
     if not recipe_id in recipes:
         # generates the recipe from scratch if it does
-        recipe = { "ingredients": [ "lots of love" ] }
+        recipe = generate_recipe_data(url)
 
         # save the recipe for when the redirect happens
         recipes[recipe_id] = recipe
