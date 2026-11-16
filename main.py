@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect
 from dotenv import load_dotenv
 from google import genai
+from google.genai import errors as genai_errors
 from requests import RequestException
 import hashlib
 
@@ -47,6 +48,10 @@ def generate_recipe():
         except RequestException:
             return render_template("error.html", errors = [
                 "Failed to fetch website data. Check if your URL is formatted correctly and the website is responding, and try again."
+            ])
+        except genai_errors.APIError, genai_errors.ClientError:
+            return render_template("error.html", errors = [
+                "Something went wrong while summarizing. Try again in a few minutes."
             ])
 
         # save the recipe for when the redirect happens
