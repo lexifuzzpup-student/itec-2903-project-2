@@ -1,7 +1,19 @@
 {% extends 'base.html' %}
+{% block head %}
+<script>
+    window.addEventListener("load", () => {
+        const recipeForm = document.getElementById("recipe-form");
+
+        recipeForm.addEventListener("submit", () => {
+            recipeForm.style.display = "none";
+            recipeForm.insertAdjacentText("afterend", "Loading recipe...");
+        })
+    });
+</script>
+{% endblock %}
 {% block content %}
 
-<form action="/generate-recipe" method="POST">
+<form id="recipe-form" action="/generate-recipe" method="POST">
     <label for="url-text">LLM will extract recipe from a URL</label>
     <input name="url" id="url-text" placeholder="Enter URL here" style="width: 100%; box-sizing: border-box;" />
     <button type="submit" class="url-button">Submit URL</button>
