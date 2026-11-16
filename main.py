@@ -14,6 +14,11 @@ recipes = {}
 # create the app, labeled using the current filename
 app = Flask(__name__)
 
+# define custom 404 page
+@app.errorhandler(404)
+def not_found(_):
+    return render_template("404.html")
+
 # define webpage route and callback
 @app.route("/", methods=["GET"])
 def homepage():
