@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<form method="POST">
+<form action="/generate-recipe" method="POST">
     <label for="url-text">LLM will extract recipe from a URL</label>
     <input name="url" id="url-text" placeholder="Enter URL here" style="width: 100%; box-sizing: border-box;" />
     <button type="submit" class="url-button">Submit URL</button>
