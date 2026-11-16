@@ -5,8 +5,7 @@
 
 <form method="POST">
     <label for="url-text">LLM will extract recipe from a URL</label>
-    <textarea name="url" id="url-text" placeholder="Enter url here" style="width:500px; height: 10px; resize: none;">{{text}}</textarea>
-    <button type="submit" class="url-button">Submit Url</button>
-
+    <input name="url" id="url-text" placeholder="Enter url here" style="width: 100%; box-sizing: border-box;">{{text}}</input>
+    <button type="submit" class="url-button">Submit URL</button>
 </form>
 {% endblock %}
