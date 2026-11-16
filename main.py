@@ -8,6 +8,7 @@ from schema import get_model_config # Import the schema and prompt settings
 from recipe_requests import fetch_recipe_website
 
 load_dotenv()
+client = genai.Client()  # Reads key from .env
 
 # store processed recipes in a { [uuid]: [recipe] } dict
 recipes = {}
@@ -16,9 +17,17 @@ recipes = {}
 def generate_recipe_data(url: str):
     website_contents = fetch_recipe_website(url)
 
-    # TODO: process data with gemini
+    # Send request to Gemini
+    response = client.models.generate_content(
+        model="gemini-3.5-flash",   # Which Gemini model
+        contents=website_contents,  # HTML data from the website
+        config=get_model_config(),  # Schema and prompt setings
+    )
+
+    # get the parsed json that gemini created
+    recipe = response.parsed
     
-    return { "contents": website_contents }
+    return recipe
 
 # create the app, labeled using the current filename
 app = Flask(__name__)
@@ -69,18 +78,6 @@ def recipe():
         return render_template("recipe.html", recipe=recipe)
     else:
         return render_template("404.html")
-
-# Quick test of schema
-@app.route("/test")  # Runs at /test
-def test_schema():
-    client = genai.Client()  # Reads key from .env
-    response = client.models.generate_content(  # Send request to Gemini
-        model="gemini-3.5-flash",  # Which Gemini model
-        contents="Toast: 2 slices bread, 1 tbsp butter. 1/4 cup of peanut butter. Toast the bread, then spread with butter, and peanut butter.  Then cut into quarters.  Then smash sandwich corners on your head for 30 seconds",  # Sample recipe text
-        config=get_model_config(),  # Schema and prompt setings
-    )
-    recipe = response.parsed  # Answer as Recipe object
-    return app.response_class(recipe.model_dump_json(indent=2), mimetype="application/json")  # Pretty JSON in browser
 
 # run the server if the file is directly executed
 if __name__ == "__main__":
