@@ -5,6 +5,7 @@ from google.genai.types import GenerateContentConfig
 
 from schema import get_model_config # Import the schema and prompt settings
 from schema import Recipe, Ingredient, Step
+from recipe_requests import fetch_recipe_website
 
 load_dotenv()
 
