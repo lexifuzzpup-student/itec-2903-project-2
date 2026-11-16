@@ -1,4 +1,11 @@
 from flask import Flask, render_template, request, send_from_directory
+from dotenv import load_dotenv
+from google import genai
+from google.genai.types import GenerateContentConfig
+
+from recipe_requests import fetch_recipe_website
+
+load_dotenv()
 
 # create the app, labeled using the current filename
 app = Flask(__name__)
