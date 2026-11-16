@@ -1,7 +1,6 @@
-# Recipe schema for Gemini
-from google.genai.types import GenerateContentConfig  # Gemini's model config class
 from pydantic import BaseModel  # Pydantic builds the schema
 
+# Recipe schema for Gemini
 
 # One line of the ingredient list
 class Ingredient(BaseModel):

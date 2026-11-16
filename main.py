@@ -1,11 +1,9 @@
 from flask import Flask, render_template, request, redirect
 from dotenv import load_dotenv
 from google import genai
-from google.genai.types import GenerateContentConfig
 import hashlib
 
 import recipe_module
-from recipe_requests import fetch_recipe_website
 
 load_dotenv()
 client = genai.Client()  # Reads key from .env
