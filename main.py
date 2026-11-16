@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, redirect
 from dotenv import load_dotenv
 from google import genai
 from google.genai.types import GenerateContentConfig
-from uuid import uuid4
+import hashlib
 
 from recipe_requests import fetch_recipe_website
 
@@ -27,11 +27,24 @@ def homepage():
 
 @app.route("/generate-recipe", methods=["POST"])
 def generate_recipe():
-    recipe = { "ingredients": [ "lots of love" ] }
-    recipe_id = str(uuid4())
+    url = request.form.get("url")
 
-    # save the recipe for when the redirect happens
-    recipes[recipe_id] = recipe
+    # simply return to the home screen when no url is passed
+    if not url:
+        return redirect("/")
+
+    # hash the recipe URL so we don't regenerate a recipe we've already generated
+    hash = hashlib.new("sha1")
+    hash.update(url.encode())
+    recipe_id = hash.hexdigest()
+
+    # check if the recipe already exists
+    if not recipe_id in recipes:
+        # generates the recipe from scratch if it does
+        recipe = { "ingredients": [ "lots of love" ] }
+
+        # save the recipe for when the redirect happens
+        recipes[recipe_id] = recipe
 
     return redirect("/recipe?id=" + recipe_id)
 
