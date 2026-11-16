@@ -32,14 +32,3 @@ class Recipe(BaseModel):
     notes: list[str]  # Cook's tips
 
 
-# Temp rules
-SYSTEM_PROMPT = """Test system prompt for Gemini.  The model must follow these rules:"""
-
-# Model config holds the schema
-def get_model_config():
-    return GenerateContentConfig(
-        system_instruction=SYSTEM_PROMPT,  # Gemini's ground rulles
-        response_mime_type="application/json",  # Reply in JSON only
-        response_schema=Recipe,  # Classes become the schema
-    )
-

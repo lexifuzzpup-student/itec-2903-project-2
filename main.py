@@ -4,7 +4,7 @@ from google import genai
 from google.genai.types import GenerateContentConfig
 import hashlib
 
-from schema import get_model_config # Import the schema and prompt settings
+import recipe_module
 from recipe_requests import fetch_recipe_website
 
 load_dotenv()
@@ -12,22 +12,6 @@ client = genai.Client()  # Reads key from .env
 
 # store processed recipes in a { [uuid]: [recipe] } dict
 recipes = {}
-
-# generate the recipe json data
-def generate_recipe_data(url: str):
-    website_contents = fetch_recipe_website(url)
-
-    # Send request to Gemini
-    response = client.models.generate_content(
-        model="gemini-3.5-flash",   # Which Gemini model
-        contents=website_contents,  # HTML data from the website
-        config=get_model_config(),  # Schema and prompt setings
-    )
-
-    # get the parsed json that gemini created
-    recipe = response.parsed
-    
-    return recipe
 
 # create the app, labeled using the current filename
 app = Flask(__name__)
@@ -59,7 +43,7 @@ def generate_recipe():
     # check if the recipe already exists
     if not recipe_id in recipes:
         # generates the recipe from scratch if it does
-        recipe = generate_recipe_data(url)
+        recipe = recipe_module.generate_recipe(client, url)
 
         # save the recipe for when the redirect happens
         recipes[recipe_id] = recipe
