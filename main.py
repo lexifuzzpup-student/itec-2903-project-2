@@ -4,11 +4,13 @@ from google import genai
 from google.genai import errors as genai_errors
 from requests import RequestException
 import hashlib
+import os
 
 import recipe_module
 
 load_dotenv()
-client = genai.Client()  # Reads key from .env
+client = genai.Client()                 # Reads key from .env
+model = os.environ["GEMINI_MODEL"]      # Reads from .env - If this throws, add it to your environment variables (see .env.example)
 
 # store processed recipes in a { [uuid]: [recipe] } dict
 recipes = {}
@@ -44,7 +46,7 @@ def generate_recipe():
     if not recipe_id in recipes:
         # generates the recipe from scratch if it does
         try:
-            recipe = recipe_module.generate_recipe(client, url)
+            recipe = recipe_module.generate_recipe(client, model, url)
         except RequestException:
             return render_template("error.html", errors = [
                 "Failed to fetch website data. Check if your URL is formatted correctly and the website is responding, and try again."

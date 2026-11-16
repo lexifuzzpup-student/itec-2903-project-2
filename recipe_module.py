@@ -15,12 +15,12 @@ def get_model_config():
     )
 
 # generate the recipe json data
-def generate_recipe(client: genai.Client, url: str):
+def generate_recipe(client: genai.Client, model: str, url: str):
     website_html = fetch_recipe_website(url)
     
     # Send request to Gemini
     response = client.models.generate_content(
-        model="gemini-3.8-flash",   # Which Gemini model
+        model=model,                # Which Gemini model
         contents=website_html,      # Website HTML is the input prompt
         config=get_model_config(),  # Schema and prompt setings
     )
