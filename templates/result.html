@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>{{ recipe.title }}</h1>
+<p>{{ recipe.description }}</p>
+<p>Prep Time: {{ recipe.prep_time_min }} minutes</p>
+<p>Cook Time: {{ recipe.cook_time_min }} minutes</p>
+<p>Servings: {{ recipe.servings }}</p>
+<h2>Ingredients</h2>
+{% for ingredient in recipe.ingredients %}
+    <p>
+        {{ ingredient.quantity }}
+        {{ ingredient.unit }}
+        {{ ingredient.name }}
+        {{ ingredient.prep }}
+    </p>
+{% endfor %}
+
+<h2>Instructions</h2>
+
+{% for step in recipe.steps %}
+    <h3>{{ step.order }}. {{ step.short }}</h3>
+    <p>{{ step.text }}</p>
+{% endfor %}
+{% endblock %}
+
+
+

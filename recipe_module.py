@@ -1,19 +1,25 @@
 from google import genai
 from google.genai.types import GenerateContentConfig
-from recipe_requests import fetch_recipe_website
+from pydantic import BaseModel
+from schema import Recipe
 
-with open("system_instructions.txt", "r") as file:
-    instructions = file.read()
-url = input("Enter recipe URL: ").strip()
-website_html = fetch_recipe_website(url)
 
-client = genai.Client()
-response = client.models.generate_content(
-    model = "gemini-3.8-flash",
-    contents=website_html,
-    config = GenerateContentConfig(
-        system_instruction=instructions,
 
+
+def generate_recipe(web_html):
+    with open("system_instructions.txt", "r") as file:
+        instructions = file.read()
+
+    client = genai.Client()
+    response = client.models.generate_content(
+        model = "gemini-3.8-flash",
+        contents=web_html,
+        config = GenerateContentConfig(
+            system_instruction=instructions,
+            response_mime_type='application/json',
+            response_schema=Recipe
+
+        )
     )
-)
-print(response.text)
+
+    return response.parsed
