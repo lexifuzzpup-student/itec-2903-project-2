@@ -1,11 +1,10 @@
 {% extends 'base.html' %}
 {% block content %}
 
-
-
 <form method="POST">
     <label for="url-text">LLM will extract recipe from a URL</label>
-    <input name="url" id="url-text" placeholder="Enter url here" style="width: 100%; box-sizing: border-box;">{{text}}</input>
+    <input name="url" id="url-text" placeholder="Enter URL here" style="width: 100%; box-sizing: border-box;" />
     <button type="submit" class="url-button">Submit URL</button>
 </form>
+
 {% endblock %}
