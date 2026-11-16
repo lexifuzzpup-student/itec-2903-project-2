@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h2>{{ errors|length() < 2 and "An error occured!" or "Some errors occured!" }}</h2>
+
+{% for error in errors %}
+    <p>{{ error }}</p>
+{% endfor %}
+
+{% endblock %}

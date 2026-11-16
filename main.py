@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect
 from dotenv import load_dotenv
 from google import genai
 from google.genai.types import GenerateContentConfig
+from requests import RequestException
 import hashlib
 
 from schema import get_model_config # Import the schema and prompt settings
@@ -50,7 +51,12 @@ def generate_recipe():
     # check if the recipe already exists
     if not recipe_id in recipes:
         # generates the recipe from scratch if it does
-        recipe = generate_recipe_data(url)
+        try:
+            recipe = generate_recipe_data(url)
+        except RequestException:
+            return render_template("error.html", errors = [
+                "Failed to fetch website data. Check if your URL is formatted correctly and the website is responding, and try again."
+            ])
 
         # save the recipe for when the redirect happens
         recipes[recipe_id] = recipe
