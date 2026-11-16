@@ -4,6 +4,7 @@ from google import genai
 from google.genai.types import GenerateContentConfig
 
 from schema import get_model_config # Import the schema and prompt settings
+from schema import Recipe, Ingredient, Step
 
 load_dotenv()
 
@@ -21,11 +22,13 @@ def test_schema():
     client = genai.Client()  # Reads key from .env
     response = client.models.generate_content(  # Send request to Gemini
         model="gemini-3.5-flash",  # Which Gemini model
-        contents="Toast: 2 slices bread, 1 tbsp butter. 1/4 cup of peanut butter. Toast the bread, then spread with butter, and peanut butter.  Then cut into quarters.  Then smash sandwich corners on your head for 30 seconds",  # Sample recipe text
+        contents="Toast: 2 slices bread, 1 tbsp butter. 1/4 cup of peanut butter. Toast the bread, then spread with butter, and peanut butter.  Then cut into quarters.  Note: Look around and Then smash sandwich corners on your head for 30 seconds",  # Sample recipe text
         config=get_model_config(),  # Schema and prompt setings
     )
     recipe = response.parsed  # Answer as Recipe object
-    return app.response_class(recipe.model_dump_json(indent=2), mimetype="application/json")  # Pretty JSON in browser
+    return render_template("recipe.html", recipe=recipe)  # Show it as a page
+
+
 
 # run the server if the file is directly executed
 if __name__ == "__main__":
