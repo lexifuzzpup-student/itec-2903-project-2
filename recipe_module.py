@@ -25,7 +25,10 @@ def generate_recipe(client: genai.Client, url: str):
         config=get_model_config(),  # Schema and prompt setings
     )
 
+    if not response.text:
+        return None
+
     # get the parsed json that gemini created
-    recipe = response.parsed
+    recipe = Recipe.model_validate_json(response.text)
     
     return recipe

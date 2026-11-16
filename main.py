@@ -54,6 +54,15 @@ def generate_recipe():
                 "Something went wrong while summarizing. Try again in a few minutes."
             ])
 
+        if not recipe:
+            return render_template("error.html", errors = [
+                "No recipe was generated. Please try again."
+            ])
+        if recipe.error:
+            return render_template("error.html", errors = [
+                recipe.error
+            ])
+
         # save the recipe for when the redirect happens
         recipes[recipe_id] = recipe
 
