@@ -1,103 +1,64 @@
-<!DOCTYPE html> <!-- Tells browser its HTML -->
-<html>
-<head>
-  <meta charset="utf-8"> <!-- Lets special letters show -->
-  <title>{{ recipe.title }}</title> <!-- Tab shows recipe name -->
-  <style>
-    /* Basic page look */
-    body {
-      font-family: Arial, sans-serif; /* Simple easy font */
-      background-color: #f4f4f4; /* Light gray backround */
-      margin: 20px; /* Space around page */
-    }
+{% extends 'base.html' %}
 
-    /* Center the recipe */
-    .recipe {
-      max-width: 700px; /* Not too wide */
-      margin: auto; /* Puts box in middle */
-      background-color: white; /* White recipe box */
-      padding: 20px; /* Space inside box */
-      border: 1px solid #ccc; /* Thin gray boarder */
-    }
+{# Extra styles for this page #}
+{% block head %}
+<style>
+  /* Times and servings */
+  .info {
+    color: gray; /* Makes it look quieter */
+  }
 
-    /* Heading colors */
-    h1 {
-      color: darkgreen; /* Big title is green */
-    }
-    h2 {
-      color: darkgreen; /* Section titles also green */
-      border-bottom: 1px solid #ccc; /* Line under headings */
-    }
+  /* Note's in a box */
+  .notes {
+    border: 1px solid gray; /* Thin box around notes */
+    padding: 10px; /* Room inside notes */
+  }
+</style>
+{% endblock %}
 
-    /* Times and servings */
-    .info {
-      color: gray; /* Makes it look quieter */
-    }
+{# The recipe itself #}
+{% block content %}
 
-    /* Note's in a box */
-    .notes {
-      background-color: lightyellow; /* Yellow like sticky note */
-      padding: 10px; /* Room inside notes */
-    }
+  {# Title and summary #}
+  <h2>{{ recipe.title }}</h2> {# Recipe name on top #}
+  {% if recipe.description %}<p>{{ recipe.description }}</p>{% endif %} {# Only if one exists #}
 
-    /* Error shows in red */
-    .error {
-      color: red; /* Red mean bad */
-    }
-  </style>
-</head>
-<body>
-  <div class="recipe"> <!-- The white box -->
+  {# Times and servings #}
+  {# Each line skip if empty #}
+  <ul class="info">
+    {% if recipe.prep_time_min %}<li>Prep: {{ '%g' % recipe.prep_time_min }} min</li>{% endif %}
+    {% if recipe.cook_time_min %}<li>Cook: {{ '%g' % recipe.cook_time_min }} min</li>{% endif %}
+    {% if recipe.total_time_min %}<li>Total: {{ '%g' % recipe.total_time_min }} min</li>{% endif %}
+    {% if recipe.servings %}<li>Serves: {{ recipe.servings }}</li>{% endif %}
+  </ul>
 
-    {# Not a recipe, show error #}
-    {% if not recipe.is_recipe %}
-      <h1 class="error">No recipe found</h1> {# Big red heding #}
-      <p>{{ recipe.error }}</p> {# Why it failed #}
-    {% else %}
+  {# Each ingredient on a line #}
+  <h3>Ingredients</h3>
+  <ul>
+    {% for ingredient in recipe.ingredients %} {# Loop thru ingredients #}
+    <li>
+      {% if ingredient.quantity %}{{ '%g' % ingredient.quantity }}{% endif %} {# Number, if it has one #}
+      {{ ingredient.unit or "" }} {{ ingredient.name }}{% if ingredient.prep %}, {{ ingredient.prep }}{% endif %} {# Unit, name, then prep #}
+    </li>
+    {% endfor %} {# End of loop #}
+  </ul>
 
-      {# Title and summary #}
-      <h1>{{ recipe.title }}</h1> {# Recipe name on top #}
-      {% if recipe.description %}<p>{{ recipe.description }}</p>{% endif %} {# Only if one exists #}
+  {# Numberd directions in order #}
+  <h3>Directions</h3>
+  <ol>
+    {% for step in recipe.steps %} {# One item per step #}
+    <li>{{ step.text }}{% if step.duration_min %} ({{ '%g' % step.duration_min }} min){% endif %}</li> {# Step text plus minutes #}
+    {% endfor %}
+  </ol>
 
-      {# Times and servings #}
-      {# Each line skip if empty #}
-      <ul class="info">
-        {% if recipe.prep_time_min %}<li>Prep: {{ '%g' % recipe.prep_time_min }} min</li>{% endif %}
-        {% if recipe.cook_time_min %}<li>Cook: {{ '%g' % recipe.cook_time_min }} min</li>{% endif %}
-        {% if recipe.total_time_min %}<li>Total: {{ '%g' % recipe.total_time_min }} min</li>{% endif %}
-        {% if recipe.servings %}<li>Serves: {{ recipe.servings }}</li>{% endif %}
-      </ul>
-
-      {# Each ingredient on a line #}
-      <h2>Ingredients</h2>
-      <ul>
-        {% for ingredient in recipe.ingredients %} {# Loop thru ingredients #}
-        <li>
-          {% if ingredient.quantity %}{{ '%g' % ingredient.quantity }}{% endif %} {# Number, if it has one #}
-          {{ ingredient.unit or "" }} {{ ingredient.name }}{% if ingredient.prep %}, {{ ingredient.prep }}{% endif %} {# Unit, name, then prep #}
-        </li>
-        {% endfor %} {# End of loop #}
-      </ul>
-
-      {# Numberd directions in order #}
-      <h2>Directions</h2>
-      <ol>
-        {% for step in recipe.steps %} {# One item per step #}
-        <li>{{ step.text }}{% if step.duration_min %} ({{ '%g' % step.duration_min }} min){% endif %}</li> {# Step text plus minutes #}
-        {% endfor %}
-      </ol>
-
-      {# Cook's notes, if any #}
-      {% if recipe.notes %}
-      <div class="notes"> <!-- Yellow notes box -->
-        <h2>Notes</h2>
-        <ul>
-          {% for note in recipe.notes %}<li>{{ note }}</li>{% endfor %} {# Each note listed #}
-        </ul>
-      </div>
-      {% endif %}
-
-    {% endif %} {# End of the recipe chek #}
+  {# Cook's notes, if any #}
+  {% if recipe.notes %}
+  <div class="notes"> <!-- Notes box -->
+    <h3>Notes</h3>
+    <ul>
+      {% for note in recipe.notes %}<li>{{ note }}</li>{% endfor %} {# Each note listed #}
+    </ul>
   </div>
-</body>
-</html>
+  {% endif %}
+
+{% endblock %}
