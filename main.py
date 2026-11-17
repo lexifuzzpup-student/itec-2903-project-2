@@ -1,32 +1,87 @@
-from flask import Flask, render_template, request, send_from_directory
+from flask import Flask, render_template, request, redirect
 from dotenv import load_dotenv
 from google import genai
-from google.genai.types import GenerateContentConfig
+from google.genai import errors as genai_errors
+from requests import RequestException
+import hashlib
+import os
 
-from schema import get_model_config # Import the schema and prompt settings
-from recipe_requests import fetch_recipe_website
+import recipe_module
 
 load_dotenv()
+client = genai.Client()                 # Reads key from .env
+model = os.environ["GEMINI_MODEL"]      # Reads from .env - If this throws, add it to your environment variables (see .env.example)
+
+# store processed recipes in a { [uuid]: [recipe] } dict
+recipes = {}
 
 # create the app, labeled using the current filename
 app = Flask(__name__)
 
-# define webpage route and callback
-@app.route("/")
-def homepage():
-    return 'hello!'
+# define custom 404 page
+@app.errorhandler(404)
+def not_found(_):
+    return render_template("404.html")
 
-# Quick test of schema
-@app.route("/test")  # Runs at /test
-def test_schema():
-    client = genai.Client()  # Reads key from .env
-    response = client.models.generate_content(  # Send request to Gemini
-        model="gemini-3.5-flash",  # Which Gemini model
-        contents="Toast: 2 slices bread, 1 tbsp butter. 1/4 cup of peanut butter. Toast the bread, then spread with butter, and peanut butter.  Then cut into quarters.  Then smash sandwich corners on your head for 30 seconds",  # Sample recipe text
-        config=get_model_config(),  # Schema and prompt setings
-    )
-    recipe = response.parsed  # Answer as Recipe object
-    return app.response_class(recipe.model_dump_json(indent=2), mimetype="application/json")  # Pretty JSON in browser
+# define webpage route and callback
+@app.route("/", methods=["GET"])
+def homepage():
+    url = request.form.get("url")
+    return render_template("homepage.html", url=url)
+
+@app.route("/generate-recipe", methods=["POST"])
+def generate_recipe():
+    url = request.form.get("url")
+
+    # simply return to the home screen when no url is passed
+    if not url:
+        return redirect("/")
+
+    # hash the recipe URL so we don't regenerate a recipe we've already generated
+    hash = hashlib.new("sha1")
+    hash.update(url.encode())
+    recipe_id = hash.hexdigest()
+
+    # check if the recipe already exists
+    if not recipe_id in recipes:
+        # generates the recipe from scratch if it does
+        try:
+            recipe = recipe_module.generate_recipe(client, model, url)
+        except RequestException:
+            return render_template("error.html", errors = [
+                "Failed to fetch website data. Check if your URL is formatted correctly and the website is responding, and try again."
+            ])
+        except genai_errors.APIError, genai_errors.ClientError:
+            return render_template("error.html", errors = [
+                "Something went wrong while summarizing. Try again in a few minutes."
+            ])
+
+        if not recipe:
+            return render_template("error.html", errors = [
+                "No recipe was generated. Please try again."
+            ])
+        if recipe.error:
+            return render_template("error.html", errors = [
+                recipe.error
+            ])
+
+        # save the recipe for when the redirect happens
+        recipes[recipe_id] = recipe
+
+    return redirect("/recipe?id=" + recipe_id)
+
+@app.route("/recipe", methods=["GET"])
+def recipe():
+    # get the id from the url search params (?id={something})
+    recipe_id = request.args.get("id")
+
+    # look up the recipe
+    recipe = recipes.get(recipe_id)
+
+    if recipe:
+        return render_template("recipe.html", recipe=recipe)
+    else:
+        return render_template("404.html")
 
 # run the server if the file is directly executed
 if __name__ == "__main__":

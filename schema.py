@@ -1,7 +1,6 @@
-# Recipe schema for Gemini
-from google.genai.types import GenerateContentConfig  # Gemini's model config class
 from pydantic import BaseModel  # Pydantic builds the schema
 
+# Recipe schema for Gemini
 
 # One line of the ingredient list
 class Ingredient(BaseModel):
@@ -31,15 +30,4 @@ class Recipe(BaseModel):
     steps: list[Step]  # Directions in order
     notes: list[str]  # Cook's tips
 
-
-# Temp rules
-SYSTEM_PROMPT = """Test system prompt for Gemini.  The model must follow these rules:"""
-
-# Model config holds the schema
-def get_model_config():
-    return GenerateContentConfig(
-        system_instruction=SYSTEM_PROMPT,  # Gemini's ground rulles
-        response_mime_type="application/json",  # Reply in JSON only
-        response_schema=Recipe,  # Classes become the schema
-    )
 
