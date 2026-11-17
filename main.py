@@ -47,7 +47,8 @@ def generate_recipe():
         # generates the recipe from scratch if it does
         try:
             recipe = recipe_module.generate_recipe(client, model, url)
-        except RequestException:
+        except RequestException as error:
+            print(error)
             return render_template("error.html", errors = [
                 "Failed to fetch website data. Check if your URL is formatted correctly and the website is responding, and try again."
             ]), 400
