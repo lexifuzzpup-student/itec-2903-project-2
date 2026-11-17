@@ -1,6 +1,64 @@
 {% extends 'base.html' %}
+
+{# Extra styles for this page #}
+{% block head %}
+<style>
+  /* Times and servings */
+  .info {
+    color: gray; /* Makes it look quieter */
+  }
+
+  /* Note's in a box */
+  .notes {
+    border: 1px solid gray; /* Thin box around notes */
+    padding: 10px; /* Room inside notes */
+  }
+</style>
+{% endblock %}
+
+{# The recipe itself #}
 {% block content %}
 
-<p>{{recipe}}</p>
+  {# Title and summary #}
+  <h2>{{ recipe.title }}</h2> {# Recipe name on top #}
+  {% if recipe.description %}<p>{{ recipe.description }}</p>{% endif %} {# Only if one exists #}
+
+  {# Times and servings #}
+  {# Each line skip if empty #}
+  <ul class="info">
+    {% if recipe.prep_time_min %}<li>Prep: {{ '%g' % recipe.prep_time_min }} min</li>{% endif %}
+    {% if recipe.cook_time_min %}<li>Cook: {{ '%g' % recipe.cook_time_min }} min</li>{% endif %}
+    {% if recipe.total_time_min %}<li>Total: {{ '%g' % recipe.total_time_min }} min</li>{% endif %}
+    {% if recipe.servings %}<li>Serves: {{ recipe.servings }}</li>{% endif %}
+  </ul>
+
+  {# Each ingredient on a line #}
+  <h3>Ingredients</h3>
+  <ul>
+    {% for ingredient in recipe.ingredients %} {# Loop thru ingredients #}
+    <li>
+      {% if ingredient.quantity %}{{ '%g' % ingredient.quantity }}{% endif %} {# Number, if it has one #}
+      {{ ingredient.unit or "" }} {{ ingredient.name }}{% if ingredient.prep %}, {{ ingredient.prep }}{% endif %} {# Unit, name, then prep #}
+    </li>
+    {% endfor %} {# End of loop #}
+  </ul>
+
+  {# Numberd directions in order #}
+  <h3>Directions</h3>
+  <ol>
+    {% for step in recipe.steps %} {# One item per step #}
+    <li>{{ step.text }}{% if step.duration_min %} ({{ '%g' % step.duration_min }} min){% endif %}</li> {# Step text plus minutes #}
+    {% endfor %}
+  </ol>
+
+  {# Cook's notes, if any #}
+  {% if recipe.notes %}
+  <div class="notes"> <!-- Notes box -->
+    <h3>Notes</h3>
+    <ul>
+      {% for note in recipe.notes %}<li>{{ note }}</li>{% endfor %} {# Each note listed #}
+    </ul>
+  </div>
+  {% endif %}
 
 {% endblock %}
